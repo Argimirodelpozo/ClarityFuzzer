@@ -1,7 +1,6 @@
 import sys
 import tree_sitter_clarity as tsclar
 import tree_sitter as ts
-
 from typing import Generator
 
 # The plan in a nutshell
@@ -13,29 +12,53 @@ TSCLARITY = ts.Language(tsclar.language())
 # The parser creates a TsTree based on the language that we have already defined
 ClarityParser = ts.Parser(TSCLARITY)
 
-def traverse_tree(tree: ts.Tree) -> Generator[ts.Node, None, None]:
-    cursor = tree.walk()
+class NodeIterator:
+    root_node: ts.Node
+    cursor: ts.TreeCursor
+    visited = []
 
-    visited_children = False
-    while True:
-        if not visited_children:
-            """
-            CAMI: Lo dejo de momento
+    def __init__(self, node: ts.Node):
+        self.root_node = node
+        self.cursor = node.walk()
+        self.visited = []
 
-            <HELP> 
+        while self.cursor.goto_first_child():
+            pass
 
-            Cuando el intérprete Python encuentra una función que incluye un yield (o varios), 
-            entiende que al llamar esta función no obtendremos un valor devuelto con un return, 
-            sino que obtendremos un generador (generator). Los generadores son iterables.
-            
-            """
-            yield cursor.node
-            if not cursor.goto_first_child():
-                visited_children = True
-        elif cursor.goto_next_sibling():
-            visited_children = False
-        elif not cursor.goto_parent():
-            break
+    def next(self) -> ts.Node | None:
+        while True:
+            node = self.node()
+
+            if node not in self.visited:
+                if self.cursor.goto_first_child():
+                    continue
+                self.visited.append(node)
+                return node
+
+            if self.cursor.goto_next_sibling():
+                while self.cursor.goto_first_child():
+                    pass
+            else:
+
+                if not self.cursor.goto_parent():
+                    return None
+                parent_node = self.cursor.node
+                self.visited.append(parent_node)
+                return parent_node
+
+    def node(self) -> ts.Node | None:
+        return self.cursor.node
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> ts.Node | None:
+        node = self.next()
+        if node is None:
+            raise StopIteration
+        return node
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -46,6 +69,12 @@ if __name__ == "__main__":
         file = open(filename, "r")
         file_content = file.read()
         file.close()
-
+     
         clarity_tree = ClarityParser.parse(bytes(file_content, "utf8"))
+        root_node = clarity_tree.root_node
+        iterator = NodeIterator(root_node)
         
+        cpp_out = ""
+
+        for node in iterator:
+            print(node.type)
