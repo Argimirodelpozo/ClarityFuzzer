@@ -6,7 +6,6 @@
 #include <signal.h>
 #include <string.h>
 #include <limits.h>
-// #include "talgo_approval.generated.cpp"
 
 /* this lets the source compile without afl-clang-fast/lto */
 #ifndef __AFL_FUZZ_TESTCASE_LEN
@@ -33,24 +32,15 @@ __AFL_FUZZ_INIT();
 
 
 
-void execute_contract_call()
+void contract_call()
 {
-  Stack s;
-  // contract0(s);
-}
+  //Prepare state
+  BlockchainState St;
+  //fuzz blockchain state here (when applicable)
+  //fuzz context here (when applicable)
 
-
-
-
-void prepare_call()
-{
-    BlockchainState St;
-    EvalContext ctx;
-
-    //fuzz blockchain state here (when applicable)
-    //fuzz context here (when applicable)
-
-    execute_contract_call();
+  //prepare arguments
+  //execute contract
 }
 
 
@@ -89,7 +79,7 @@ int main(int argc, char **argv)
     len = read(0, buf, 100);
 
     //TODO: special function to prepare input goes here
-    prepare_call();
+    contract_call();
   }
 
   return 0;
@@ -100,4 +90,8 @@ int main(int argc, char **argv)
 
 // TO COMPILE RUN 
 //    afl-clang-fast -o fuzz_target ClarityFuzzer.cpp -lstdc++
+// in WSL
+
+// TO RUN
+//    afl-fuzz -i seeds -o out -- ./fuzz_target
 // in WSL

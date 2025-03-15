@@ -1,8 +1,12 @@
 #include "ClarityCommon.h"
 
+clarity_type stx_get_balance(clarity_type user_principal)
+{
+    
+}
+
 
 /*
-
 * (multiply)​
 + (add)​
 - (subtract)​
@@ -108,7 +112,6 @@ string-to-int?​
 string-to-uint?​
 stx-account​
 stx-burn?​
-stx-get-balance​
 stx-transfer-memo?​
 stx-transfer?​
 to-consensus-buff?​
