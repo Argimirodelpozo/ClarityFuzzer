@@ -1,4 +1,4 @@
-#include "AVMCommon.h"
+#include "ClarityCommon.h"
 #include "opcodeDefinitions.cpp"
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,9 +88,6 @@ int main(int argc, char **argv)
 
     len = read(0, buf, 100);
 
-    /* STEP 3: This is where we'd call the tested library on the read data.
-               We just have some trivial inline code that faults on 'foo!'. */
-
     //TODO: special function to prepare input goes here
     prepare_call();
   }
@@ -102,5 +99,5 @@ int main(int argc, char **argv)
 
 
 // TO COMPILE RUN 
-//    afl-clang-fast -o fuzz_target FuzzAVM.cpp -lstdc++
+//    afl-clang-fast -o fuzz_target ClarityFuzzer.cpp -lstdc++
 // in WSL

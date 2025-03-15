@@ -1,3 +1,12 @@
+def generate_list(max_len:int, entry_type:str):
+
+    pass
+
+def generate_read_only(function_name, function_args, function_body):
+    out:str = function_name + ""
+    pass
+
+
 
 
 def parse_contract(filename:str):
