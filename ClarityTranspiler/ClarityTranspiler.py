@@ -2,6 +2,8 @@ import sys
 import tree_sitter_clarity as tsclar
 import tree_sitter as ts
 from typing import Generator
+import types_systems as traductor
+from colors import TerminalColors
 
 # The plan in a nutshell
 # Parser the code -> generate an AST -> Walk the tree and generate the equivalent code in cpp
@@ -11,53 +13,6 @@ TSCLARITY = ts.Language(tsclar.language())
 
 # The parser creates a TsTree based on the language that we have already defined
 ClarityParser = ts.Parser(TSCLARITY)
-
-class NodeIterator:
-    root_node: ts.Node
-    cursor: ts.TreeCursor
-    visited = []
-
-    def __init__(self, node: ts.Node):
-        self.root_node = node
-        self.cursor = node.walk()
-        self.visited = []
-
-        while self.cursor.goto_first_child():
-            pass
-
-    def next(self) -> ts.Node | None:
-        while True:
-            node = self.node()
-
-            if node not in self.visited:
-                if self.cursor.goto_first_child():
-                    continue
-                self.visited.append(node)
-                return node
-
-            if self.cursor.goto_next_sibling():
-                while self.cursor.goto_first_child():
-                    pass
-            else:
-
-                if not self.cursor.goto_parent():
-                    return None
-                parent_node = self.cursor.node
-                self.visited.append(parent_node)
-                return parent_node
-
-    def node(self) -> ts.Node | None:
-        return self.cursor.node
-
-    def __iter__(self):
-        return self
-
-    def __next__(self) -> ts.Node | None:
-        node = self.next()
-        if node is None:
-            raise StopIteration
-        return node
-
 
 
 if __name__ == "__main__":
@@ -72,9 +27,23 @@ if __name__ == "__main__":
      
         clarity_tree = ClarityParser.parse(bytes(file_content, "utf8"))
         root_node = clarity_tree.root_node
-        iterator = NodeIterator(root_node)
         
-        cpp_out = ""
+        tree_cursor = root_node.walk()
+        tree_cursor.goto_first_child()
+        arr = []
 
-        for node in iterator:
-            print(node.type)
+        while True:
+            arr.append(tree_cursor.node)
+            if not tree_cursor.goto_next_sibling():
+                break
+
+        
+        program = traductor.Traductor(arr)
+
+        program.transpile()
+        
+        print(f"{TerminalColors.PINK}Transpilation finished.{TerminalColors.ENDC}")
+        print(f"{TerminalColors.PINK}Original program:{TerminalColors.ENDC}")
+        print(file_content)
+        print(f"{TerminalColors.PINK}Transpiled program:{TerminalColors.ENDC}")
+        program.print_program()
