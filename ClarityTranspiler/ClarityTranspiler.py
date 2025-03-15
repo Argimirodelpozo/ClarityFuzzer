@@ -16,11 +16,13 @@ ClarityParser = ts.Parser(TSCLARITY)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print("ERROR::WRONG USE. This is the way: ClarityTranspiler path_to_clarity_contract")
         sys.exit(1)
     else:
         filename = sys.argv[1]
+        dbg = sys.argv[2]
+        
         file = open(filename, "r")
         file_content = file.read()
         file.close()
@@ -42,8 +44,11 @@ if __name__ == "__main__":
 
         program.transpile()
         
-        print(f"{TerminalColors.PINK}Transpilation finished.{TerminalColors.ENDC}")
-        print(f"{TerminalColors.PINK}Original program:{TerminalColors.ENDC}")
-        print(file_content)
-        print(f"{TerminalColors.PINK}Transpiled program:{TerminalColors.ENDC}")
-        program.print_program()
+        if dbg == "1":
+            print(f"{TerminalColors.PINK}Transpilation finished.{TerminalColors.ENDC}")
+            print(f"{TerminalColors.PINK}Original program:{TerminalColors.ENDC}")
+            print(file_content)
+            print(f"{TerminalColors.PINK}Transpiled program:{TerminalColors.ENDC}")
+            
+            
+            program.print_program()
